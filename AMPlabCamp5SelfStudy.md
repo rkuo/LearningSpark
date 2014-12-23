@@ -1,8 +1,13 @@
 # AMPLab Camp 5 Self Study
 
 ## Online Resources
-- [Slide, Video]
-- [Getting Started With Your USB Stick]
+- From camp site [Slide, Video] and [Getting Started With Your USB Stick]
+- There are some additional slides and videos from [Spark Summit 2014 Training].
+
+[Slide, Video]: http://ampcamp.berkeley.edu/5/
+[Getting Started With Your USB Stick]: http://ampcamp.berkeley.edu/5/exercises/getting-started.html
+
+[Spark Summit 2014 Training]: http://spark-summit.org/2014/training#news-page
 
 ### Compare Hadoop Distributions
 Possible use one of these vm as base:
@@ -11,6 +16,18 @@ Possible use one of these vm as base:
 Cloudera just introduced Impala which may be a killer feature for some. MapR has some unique HA attributes and uses a NFS compatible filesystem. MapR is supposedly the fastest Hadoop solution in the market. Also there is a short [video compare Hortonworks, Cloudera, MapR and Intel]
 - [What are the core differences between Cloudera's hadoop distro and HortonWorks distro?] and some reasons [why use distros]
 - Download the latest [Hortonworks Data Platform] and follow [startup sandbox] in slideshare, or follow this blog for [setting up Hortonworks with Vagrant], which also provides a link for getting Vagrant box image. There is a [Hortonworks good community] forum to follow.
+
+[Compare Hortonworks, Cloudera and MapR]: http://www.experfy.com/blog/cloudera-vs-hortonworks-comparing-hadoop-distributions/
+[video compare Hortonworks, Cloudera, MapR and Intel]: https://www.youtube.com/watch?v=IvtyruO4dN4
+[What are the core differences between Cloudera's hadoop distro and HortonWorks distro?]: http://www.quora.com/What-are-the-core-differences-between-Clouderas-hadoop-distro-and-HortonWorks-distro
+[why use distros]: http://www.quora.com/Are-there-any-reasons-for-using-vendor-specific-Hadoop-distributions-like-Cloudera-Hortonworks-instead-of-vanilla-Apache-Hadoop-if-Im-not-using-their-support-services
+[Hortonworks Data Platform]: http://hortonworks.com/hdp/downloads/
+
+[setting up Hortonworks with Vagrant]: (http://hortonworks.com/blog/building-hadoop-vm-quickly-ambari-vagrant/
+[Hortonworks good community]: http://hortonworks.com/community/forums/
+[startup sandbox]: http://www.slideshare.net/hortonworks/sandbox-startup
+[Monitoring and Instrumentation]: http://spark.apache.org/docs/1.1.1/monitoring.html
+[Quick Start]: http://spark.apache.org/docs/latest/quick-start.html
 
 ## Test Labs Installation
 - Add a note file `AMPlabCamp5SelfStudy.md` (this file)
@@ -70,6 +87,13 @@ Spark context available as sc.
 ```
 A web based SparkUI is started and localhost:4040, and see [Monitoring and Instrumentation] for details. 
 
+Try the following command, which should return 1000:
+
+```
+scala> sc.parallelize(1 to 1000).count()
+```
+We should see it returns 1000.
+
 Create a RDD
 
 ```
@@ -121,28 +145,96 @@ Nothing happens, from we can see from here.
 
 **some problem here**
 
+I think it just could not find file:
+unzip `training-downloads.zip` and merge files in data directory to existing `ampcamp5-usb/data` and modified file location to `../data/pagecounts`, worked.
+
 ```
-scala> val pagecounts = sc.textFile("data/pagecounts")
-14/12/18 15:11:45 INFO MemoryStore: ensureFreeSpace(32872) called with curMem=0, maxMem=280248975
-14/12/18 15:11:45 INFO MemoryStore: Block broadcast_0 stored as values in memory (estimated size 32.1 KB, free 267.2 MB)
-pagecounts: org.apache.spark.rdd.RDD[String] = data/pagecounts MappedRDD[1] at textFile at <console>:12
+scala> sc
+res0: org.apache.spark.SparkContext = org.apache.spark.SparkContext@7ea0788
+
+scala> val pagecounts = sc.textFile("../data/pagecounts")
+14/12/22 11:36:08 INFO MemoryStore: ensureFreeSpace(32872) called with curMem=0, maxMem=280248975
+14/12/22 11:36:08 INFO MemoryStore: Block broadcast_0 stored as values in memory (estimated size 32.1 KB, free 267.2 MB)
+pagecounts: org.apache.spark.rdd.RDD[String] = ../data/pagecounts MappedRDD[1] at textFile at <console>:12
 
 scala> pagecounts.take(10)
-java.lang.RuntimeException: java.lang.reflect.InvocationTargetException
-	at org.apache.hadoop.util.ReflectionUtils.newInstance(ReflectionUtils.java:115)
-	at org.apache.hadoop.fs.FileSystem.createFileSystem(FileSystem.java:1385)
+14/12/22 11:36:33 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+14/12/22 11:36:33 WARN LoadSnappy: Snappy native library not loaded
+14/12/22 11:36:33 INFO FileInputFormat: Total input paths to process : 2
+14/12/22 11:36:33 INFO SparkContext: Starting job: take at <console>:15
+14/12/22 11:36:33 INFO DAGScheduler: Got job 0 (take at <console>:15) with 1 output partitions 
+...[snip]...
+14/12/22 11:36:33 INFO DAGScheduler: Stage 0 (take at <console>:15) finished in 0.085 s
+14/12/22 11:36:33 INFO TaskSchedulerImpl: Removed TaskSet 0.0, whose tasks have all completed, from pool
+14/12/22 11:36:33 INFO SparkContext: Job finished: take at <console>:15, took 0.125963 s
+res1: Array[String] = Array(20090505-000000 aa Main_Page 2 9980, 20090505-000000 ab %D0%90%D0%B8%D0%BD%D1%82%D0%B5%D1%80%D0%BD%D0%B5%D1%82 1 465, 20090505-000000 ab %D0%98%D1%85%D0%B0%D0%B4%D0%BE%D1%83_%D0%B0%D0%B4%D0%B0%D2%9F%D1%8C%D0%B0 1 16086, 20090505-000000 af.b Tuisblad 1 36236, 20090505-000000 af.d Tuisblad 4 189738, 20090505-000000 af.q Tuisblad 2 56143, 20090505-000000 af Afrika 1 46833, 20090505-000000 af Afrikaans 2 53577, 20090505-000000 af Australi%C3%AB 1 132432, 20090505-000000 af Barack_Obama 1 23368)
 ```
-Based on the website, I need to set working directory to data directory, before creating sc;
+Make it prints better,
 
 ```
-System.setProperty("user.dir", "xxx")
-val sc = new SparkContext(...)
+scala> pagecounts.take(10).foreach(println)
+14/12/22 11:42:11 INFO SparkContext: Starting job: take at <console>:15
+14/12/22 11:42:11 INFO DAGScheduler: Got job 1 (take at <console>:15) with 1 output partitions (allowLocal=true)
+...[snip]...
+14/12/22 11:42:11 INFO TaskSchedulerImpl: Removed TaskSet 1.0, whose tasks have all completed, from pool
+14/12/22 11:42:11 INFO SparkContext: Job finished: take at <console>:15, took 0.016597 s
+20090505-000000 aa Main_Page 2 9980
+20090505-000000 ab %D0%90%D0%B8%D0%BD%D1%82%D0%B5%D1%80%D0%BD%D0%B5%D1%82 1 465
+20090505-000000 ab %D0%98%D1%85%D0%B0%D0%B4%D0%BE%D1%83_%D0%B0%D0%B4%D0%B0%D2%9F%D1%8C%D0%B0 1 16086
+20090505-000000 af.b Tuisblad 1 36236
+20090505-000000 af.d Tuisblad 4 189738
+20090505-000000 af.q Tuisblad 2 56143
+20090505-000000 af Afrika 1 46833
+20090505-000000 af Afrikaans 2 53577
+20090505-000000 af Australi%C3%AB 1 132432
+20090505-000000 af Barack_Obama 1 23368
 ```
 
-- Tried xxx = spark/data did not work. 
-- Tried xxx = `/Users/rkuo/Projects/spark/ampcamp5/ampcamp5-usb/spark` did not work either
+It looks like, it automatic split the work into multiple job/tasks,
 
-**Switch to [Quick Start], come back here later**
+```
+scala> pagecounts.count
+14/12/22 11:56:10 INFO SparkContext: Starting job: count at <console>:15
+14/12/22 11:56:10 INFO DAGScheduler: Got job 2 (count at <console>:15) with 2 output partitions (allowLocal=false)
+14/12/22 11:56:10 INFO DAGScheduler: Final stage: Stage 2(count at <console>:15)
+14/12/22 11:56:10 INFO DAGScheduler: Parents of final stage: List()
+14/12/22 11:56:10 INFO DAGScheduler: Missing parents: List()
+14/12/22 11:56:10 INFO DAGScheduler: Submitting Stage 2 (../data/pagecounts MappedRDD[1] at textFile at <console>:12), which has no missing parents
+14/12/22 11:56:10 INFO MemoryStore: ensureFreeSpace(2392) called with curMem=37704, maxMem=280248975
+14/12/22 11:56:10 INFO MemoryStore: Block broadcast_3 stored as values in memory (estimated size 2.3 KB, free 267.2 MB)
+14/12/22 11:56:10 INFO DAGScheduler: Submitting 2 missing tasks from Stage 2 (../data/pagecounts MappedRDD[1] at textFile at <console>:12)
+14/12/22 11:56:10 INFO TaskSchedulerImpl: Adding task set 2.0 with 2 tasks
+14/12/22 11:56:10 INFO TaskSetManager: Starting task 0.0 in stage 2.0 (TID 2, localhost, PROCESS_LOCAL, 1237 bytes)
+14/12/22 11:56:10 INFO TaskSetManager: Starting task 1.0 in stage 2.0 (TID 3, localhost, PROCESS_LOCAL, 1237 bytes)
+14/12/22 11:56:10 INFO Executor: Running task 0.0 in stage 2.0 (TID 2)
+14/12/22 11:56:10 INFO Executor: Running task 1.0 in stage 2.0 (TID 3)
+14/12/22 11:56:10 INFO HadoopRDD: Input split: file:/Users/rkuo/Projects/spark/ampcamp5/ampcamp5-usb/data/pagecounts/part-00053:0+35495920
+14/12/22 11:56:10 INFO HadoopRDD: Input split: file:/Users/rkuo/Projects/spark/ampcamp5/ampcamp5-usb/data/pagecounts/part-00001:0+35926685
+14/12/22 11:56:10 INFO BlockManager: Removing broadcast 1
+14/12/22 11:56:10 INFO BlockManager: Removing block broadcast_1
+14/12/22 11:56:10 INFO MemoryStore: Block broadcast_1 of size 2416 dropped from memory (free 280211295)
+14/12/22 11:56:10 INFO ContextCleaner: Cleaned broadcast 1
+14/12/22 11:56:10 INFO BlockManager: Removing broadcast 2
+14/12/22 11:56:10 INFO BlockManager: Removing block broadcast_2
+14/12/22 11:56:10 INFO MemoryStore: Block broadcast_2 of size 2416 dropped from memory (free 280213711)
+14/12/22 11:56:10 INFO ContextCleaner: Cleaned broadcast 2
+14/12/22 11:56:11 INFO Executor: Finished task 0.0 in stage 2.0 (TID 2). 1731 bytes result sent to driver
+14/12/22 11:56:11 INFO Executor: Finished task 1.0 in stage 2.0 (TID 3). 1731 bytes result sent to driver
+14/12/22 11:56:11 INFO TaskSetManager: Finished task 0.0 in stage 2.0 (TID 2) in 934 ms on localhost (1/2)
+14/12/22 11:56:11 INFO TaskSetManager: Finished task 1.0 in stage 2.0 (TID 3) in 933 ms on localhost (2/2)
+14/12/22 11:56:11 INFO DAGScheduler: Stage 2 (count at <console>:15) finished in 0.934 s
+14/12/22 11:56:11 INFO TaskSchedulerImpl: Removed TaskSet 2.0, whose tasks have all completed, from pool
+14/12/22 11:56:11 INFO SparkContext: Job finished: count at <console>:15, took 0.940089 s
+res3: Long = 1398882
+```
+
+We can watch the operation from web gui, `http://127.0.0.1:4040` ![Spark web gui stage]
+
+[Spark web gui stage]: https://www.evernote.com/shard/s302/sh/46709ecd-be75-4650-9ce0-b6ee8167366a/c74943b822edbd7cd3d6b7dee3cf1cdc/deep/0/Spark-shell---Spark-Stages.png
+
+[???? continue from here](http://ampcamp.berkeley.edu/5/exercises/data-exploration-using-spark.html)
+
+**Switch to [Quick Start]**
 
 Read "README.md" from current directory,
 
@@ -186,7 +278,8 @@ scala> textFile.filter(line => line.contains("Spark")).count()
 res2: Long = 5
 ```
 
-## About RDD (Resilient Distributed Dataset)
+### About RDD (Resilient Distributed Dataset)
+[good RDD transformation diagram for word count example]: http://www.slideshare.net/cloudera/spark-devwebinarslides-final?related=1
 
 Create RDD,
 
@@ -246,14 +339,130 @@ scala> res3.reduce((a, b) => if (a > b) a else b)
 res7: Int = 29
 ```
 
-### Basic  
+Use a different example:
 
+```
+scala> sc
+res0: org.apache.spark.SparkContext = org.apache.spark.SparkContext@61c54dc1
+
+scala> val lines = sc.textFile("../hamlet.txt")
+14/12/22 15:15:01 INFO MemoryStore: ensureFreeSpace(32872) called with curMem=0, maxMem=280248975
+14/12/22 15:15:01 INFO MemoryStore: Block broadcast_0 stored as values in memory (estimated size 32.1 KB, free 267.2 MB)
+lines: org.apache.spark.rdd.RDD[String] = ../hamlet.txt MappedRDD[1] at textFile at <console>:12
+scala> lines.count()
+14/12/22 15:15:51 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+...[snip]...
+14/12/22 15:15:51 INFO TaskSchedulerImpl: Removed TaskSet 0.0, whose tasks have all completed, from pool
+14/12/22 15:15:51 INFO SparkContext: Job finished: count at <console>:15, took 0.149683 s
+res1: Long = 2
+```
+
+lines is a group of lines, which can be parsed further with " " to words,
+
+```
+scala> lines.map(line => line.split(" "))
+
+...[snip]...
+14/12/22 16:17:25 INFO DAGScheduler: Stage 2 (take at <console>:17) finished in 0.009 s
+14/12/22 16:17:25 INFO TaskSchedulerImpl: Removed TaskSet 2.0, whose tasks have all completed, from pool
+14/12/22 16:17:25 INFO SparkContext: Job finished: take at <console>:17, took 0.013589 s
+res3: Array[Array[String]] = Array(Array(to, be, or), Array(not, to, be))
+```
+
+Since we know we only have two lines, so take the first two lines, this produces array of array, each line is one array. 
+
+```
+scala> res2.take(2)
+14/12/22 16:17:24 INFO SparkContext: Starting job: take at <console>:17
+14/12/22 16:17:24 INFO DAGScheduler: Got job 1 (take at <console>:17) with 1 output partitions (allowLocal=true)
+...[snip]...
+14/12/22 11:01:43 INFO SparkContext: Job finished: take at <console>:17, took 0.013306 s
+res6: Array[Array[String]] = Array(Array(to, be, or), Array(not, to, be))
+```	
+flatMap, this produces one flat array of all elements,
+since we know there are 6 elements, so we can ask for display first 6 elements.
+```
+scala> lines.flatMap(line => line.split(" "))
+res4: org.apache.spark.rdd.RDD[String] = FlatMappedRDD[3] at flatMap at <console>:15
+scala> res4.take(6)
+14/12/22 16:23:03 INFO SparkContext: Starting job: take at <console>:17
+14/12/22 16:23:03 INFO DAGScheduler: Got job 4 (take at <console>:17) with 1 output partitions (allowLocal=true)
+...[snip]...
+14/12/22 16:23:03 INFO TaskSchedulerImpl: Removed TaskSet 5.0, whose tasks have all completed, from pool
+14/12/22 16:23:03 INFO SparkContext: Job finished: take at <console>:17, took 0.014058 s
+res6: Array[String] = Array(to, be, or, not, to, be)
+```
+create pairs,
+
+```
+scala> res6.map(word => (word,1))
+res7: Array[(String, Int)] = Array((to,1), (be,1), (or,1), (not,1), (to,1), (be,1))
+```
+since it is (k,v) pair, we can group them by their key,
+
+
+```
+scala> val wordCounts = lines.flatMap(line => line.split(" ")).map(word => (word, 1)).reduceByKey((a, b) => a + b)
+14/12/22 18:14:12 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+14/12/22 18:14:12 WARN LoadSnappy: Snappy native library not loaded
+14/12/22 18:14:12 INFO FileInputFormat: Total input paths to process : 1
+wordCounts: org.apache.spark.rdd.RDD[(String, Int)] = ShuffledRDD[4] at reduceByKey at <console>:14
+
+scala> wordCounts.collect()
+14/12/22 18:14:47 INFO SparkContext: Starting job: collect at <console>:17
+14/12/22 18:14:47 INFO DAGScheduler: Registering RDD 3 (map at <console>:14)
+...[snip]...
+14/12/22 18:14:48 INFO TaskSchedulerImpl: Removed TaskSet 0.0, whose tasks have all completed, from pool
+14/12/22 18:14:48 INFO SparkContext: Job finished: collect at <console>:17, took 0.555674 s
+res2: Array[(String, Int)] = Array((or,1), (not,1), (be,2), (to,2))
+scala> res2.foreach(println)
+(or,1)
+(not,1)
+(be,2)
+(to,2)
+```
+
+### Standalone App  
+[Spark Programming Guide]: http://spark.apache.org/docs/latest/programming-guide.html
+[Quick Start]: http://spark.apache.org/docs/latest/quick-start.html#a-standalone-job-in-scala
+
+Follow the instruction in [Quick Start],
+
+```
+~/Projects/spark/ampcamp5/ampcamp5-usb/simple-app nano simple.sbt
+~/Projects/spark/ampcamp5/ampcamp5-usb/simple-app sbt package       # this will take a while
+[info] Set current project to Simple Project (in build file:/Users/rkuo/Projects/spark/ampcamp5/ampcamp5-usb/simple-app/)
+[info] Updating {file:/Users/rkuo/Projects/spark/ampcamp5/ampcamp5-usb/simple-app/}simple-app...
+...[snip]...
+info] Done updating.
+[info] Compiling 1 Scala source to /Users/rkuo/Projects/spark/ampcamp5/ampcamp5-usb/simple-app/target/scala-2.10/classes...
+[info] Packaging /Users/rkuo/Projects/spark/ampcamp5/ampcamp5-usb/simple-app/target/scala-2.10/simple-project_2.10-1.0.jar ...
+[info] Done packaging.
+[success] Total time: 332 s, completed Dec 23, 2014 12:58:49 AM
+```
+
+I don't know why, **it needs `bash` shell**, 
+YOUR_SPARK_HOME = ~/Projects/spark/ampcamp5/ampcamp5-usb/spark
+
+```
+bash-3.2$ pwd
+/Users/rkuo/Projects/spark/ampcamp5/ampcamp5-usb/simple-app
+bash-3.2$ ls
+project		simple.sbt	src		target
+bash-3.2$ ~/Projects/spark/ampcamp5/ampcamp5-usb/spark/bin/spark-submit --class "SimpleApp" --master local[*] target/scala-2.10/simple-project_2.10-1.0.jar
+Using Spark's default log4j profile: org/apache/spark/log4j-defaults.properties
+...[snip]...
+14/12/23 01:36:01 INFO TaskSchedulerImpl: Removed TaskSet 1.0, whose tasks have all completed, from pool
+14/12/23 01:36:01 INFO SparkContext: Job finished: count at SimpleApp.scala:13, took 0.02046 s
+Lines with a: 83, Lines with b: 38
+bash-3.2$
+```
 
 ## Spark Streaming
 
 [difference streaming sources]: https://spark.apache.org/docs/1.2.0/img/streaming-arch.png
 
-Spark Streaming can take different streaming sources. 
+Spark Streaming can take different streaming sources. [spark streaming doc]
 ![difference streaming sources]
 
 ### Use NC
@@ -261,20 +470,13 @@ Spark Streaming can take different streaming sources.
 ### Use Kafka 
 
 ### Use Twitter
+[Deep Dive with Spark Streaming - Tathagata Das - Spark Meetup 2013-06-17]: http://www.slideshare.net/spark-project/deep-divewithsparkstreaming-tathagatadassparkmeetup20130617
 
+[Video]: http://youtu.be/D1knCQZQQnw­
 
-[Slide, Video]: http://ampcamp.berkeley.edu/5/
-[Getting Started With Your USB Stick]: http://ampcamp.berkeley.edu/5/exercises/getting-started.html
-[Compare Hortonworks, Cloudera and MapR]: http://www.experfy.com/blog/cloudera-vs-hortonworks-comparing-hadoop-distributions/
-[video compare Hortonworks, Cloudera, MapR and Intel]: https://www.youtube.com/watch?v=IvtyruO4dN4
-[What are the core differences between Cloudera's hadoop distro and HortonWorks distro?]: http://www.quora.com/What-are-the-core-differences-between-Clouderas-hadoop-distro-and-HortonWorks-distro
-[why use distros]: http://www.quora.com/Are-there-any-reasons-for-using-vendor-specific-Hadoop-distributions-like-Cloudera-Hortonworks-instead-of-vanilla-Apache-Hadoop-if-Im-not-using-their-support-services
-[Hortonworks Data Platform]: http://hortonworks.com/hdp/downloads/
-[setting up Hortonworks with Vagrant]: (http://hortonworks.com/blog/building-hadoop-vm-quickly-ambari-vagrant/
-[Hortonworks good community]: http://hortonworks.com/community/forums/
-[startup sandbox]: http://www.slideshare.net/hortonworks/sandbox-startup
-[Monitoring and Instrumentation]: http://spark.apache.org/docs/1.1.1/monitoring.html
-[Quick Start]: http://spark.apache.org/docs/latest/quick-start.html
+[Spark Submmit 2014 Data Streaming]: https://databricks-training.s3.amazonaws.com/slides/Spark%20Summit%202014%20-%20Spark%20Streaming.pdf
+
+[twitter stream set up]: http://ampcamp.berkeley.edu/3/exercises/realtime-processing-with-spark-streaming.html
 
 [spark streaming doc]: https://spark.apache.org/docs/1.2.0/streaming-programming-guide.html
 
