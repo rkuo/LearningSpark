@@ -1,16 +1,17 @@
 # AMPLab Camp 5 Self Study
 
 ## Online Resources
-- From camp site [Slide, Video] and [Getting Started With Your USB Stick]
+- From AMP camp site [Slide, Video] and [Getting Started With Your USB Stick]
 - There are some additional slides and videos from [Spark Summit 2014 Training].
 
 [Slide, Video]: http://ampcamp.berkeley.edu/5/
 [Getting Started With Your USB Stick]: http://ampcamp.berkeley.edu/5/exercises/getting-started.html
+[How to light your 'Spark on a stick']: http://blueplastic.gitbooks.io/how-to-light-your-spark-on-a-stick/content/
 
 [Spark Summit 2014 Training]: http://spark-summit.org/2014/training#news-page
 
 ### Compare Hadoop Distributions
-Possible use one of these vm as base:
+If you like to use/view HDFS, you can use one of following platform as base and add Spark to it:
 
 - [Compare Hortonworks, Cloudera and MapR] Hortonworks consists all open source packages, Cloudera and MapR are better solutions if money is not an issue and you'd like to get some advanced features. 
 Cloudera just introduced Impala which may be a killer feature for some. MapR has some unique HA attributes and uses a NFS compatible filesystem. MapR is supposedly the fastest Hadoop solution in the market. Also there is a short [video compare Hortonworks, Cloudera, MapR and Intel]
@@ -230,13 +231,45 @@ res3: Long = 1398882
 
 We can watch the operation from web gui, `http://127.0.0.1:4040` ![Spark web gui stage]
 
-[Spark web gui stage]: https://www.evernote.com/shard/s302/sh/46709ecd-be75-4650-9ce0-b6ee8167366a/c74943b822edbd7cd3d6b7dee3cf1cdc/deep/0/Spark-shell---Spark-Stages.png
+[Spark web gui stage]: https://www.evernote.com/shard/s302/sh/6b012314-b7ed-480c-b626-8cb14a994e34/c87bc6b7fb168173a018f81508ebac69/deep/0/Spark-shell---Spark-Stages.png
 
-[???? continue from here](http://ampcamp.berkeley.edu/5/exercises/data-exploration-using-spark.html)
+[continue from here later](http://ampcamp.berkeley.edu/5/exercises/data-exploration-using-spark.html) I have some problem before, it is due to file does not exist and path is not correct, `val pagecounts = sc.textFile("../data/pagecounts")` works now.
+
+```
+scala> pagecounts.count
+14/12/24 11:34:45 INFO SparkContext: Starting job: count at <console>:15
+14/12/24 11:34:45 INFO DAGScheduler: Got job 1 (count at <console>:15) with 2 output partitions (allowLocal=false)
+14/12/24 11:34:45 INFO DAGScheduler: Final stage: Stage 1(count at <console>:15)
+14/12/24 11:34:45 INFO DAGScheduler: Parents of final stage: List()
+14/12/24 11:34:45 INFO DAGScheduler: Missing parents: List()
+14/12/24 11:34:45 INFO DAGScheduler: Submitting Stage 1 (../data/pagecounts MappedRDD[3] at textFile at <console>:12), which has no missing parents
+14/12/24 11:34:45 INFO MemoryStore: ensureFreeSpace(2392) called with curMem=68184, maxMem=280248975
+14/12/24 11:34:45 INFO MemoryStore: Block broadcast_3 stored as values in memory (estimated size 2.3 KB, free 267.2 MB)
+14/12/24 11:34:45 INFO DAGScheduler: Submitting 2 missing tasks from Stage 1 (../data/pagecounts MappedRDD[3] at textFile at <console>:12)
+14/12/24 11:34:45 INFO TaskSchedulerImpl: Adding task set 1.0 with 2 tasks
+14/12/24 11:34:45 INFO TaskSetManager: Starting task 0.0 in stage 1.0 (TID 1, localhost, PROCESS_LOCAL, 1237 bytes)
+14/12/24 11:34:45 INFO TaskSetManager: Starting task 1.0 in stage 1.0 (TID 2, localhost, PROCESS_LOCAL, 1237 bytes)
+14/12/24 11:34:45 INFO Executor: Running task 0.0 in stage 1.0 (TID 1)
+14/12/24 11:34:45 INFO Executor: Running task 1.0 in stage 1.0 (TID 2)
+14/12/24 11:34:45 INFO HadoopRDD: Input split: file:/Users/rkuo/Projects/spark/ampcamp5/ampcamp5-usb/data/pagecounts/part-00001:0+35926685
+14/12/24 11:34:45 INFO HadoopRDD: Input split: file:/Users/rkuo/Projects/spark/ampcamp5/ampcamp5-usb/data/pagecounts/part-00053:0+35495920
+14/12/24 11:34:45 INFO BlockManager: Removing broadcast 2
+14/12/24 11:34:45 INFO BlockManager: Removing block broadcast_2
+14/12/24 11:34:45 INFO MemoryStore: Block broadcast_2 of size 2416 dropped from memory (free 280180815)
+14/12/24 11:34:46 INFO ContextCleaner: Cleaned broadcast 2
+14/12/24 11:34:46 INFO Executor: Finished task 1.0 in stage 1.0 (TID 2). 1922 bytes result sent to driver
+14/12/24 11:34:46 INFO Executor: Finished task 0.0 in stage 1.0 (TID 1). 1922 bytes result sent to driver
+14/12/24 11:34:46 INFO TaskSetManager: Finished task 1.0 in stage 1.0 (TID 2) in 972 ms on localhost (1/2)
+14/12/24 11:34:46 INFO TaskSetManager: Finished task 0.0 in stage 1.0 (TID 1) in 975 ms on localhost (2/2)
+14/12/24 11:34:46 INFO DAGScheduler: Stage 1 (count at <console>:15) finished in 0.976 s
+14/12/24 11:34:46 INFO TaskSchedulerImpl: Removed TaskSet 1.0, whose tasks have all completed, from pool
+14/12/24 11:34:46 INFO SparkContext: Job finished: count at <console>:15, took 0.983447 s
+res2: Long = 1398882
+```
 
 **Switch to [Quick Start]**
 
-Read "README.md" from current directory,
+Read "README.md" from current directory-spark,
 
 ```
 scala> val textFile = sc.textFile("README.md")
@@ -426,6 +459,10 @@ scala> res2.foreach(println)
 [Spark Programming Guide]: http://spark.apache.org/docs/latest/programming-guide.html
 [Quick Start]: http://spark.apache.org/docs/latest/quick-start.html#a-standalone-job-in-scala
 
+[Getting Started with Big Data Genomics Using Scala and IntelliJ]: https://www.youtube.com/watch?v=BCoIXqUfFkU
+[Setting Up IntelliJ and sbt for Scala development]: http://hanxue-it.blogspot.com/2014/06/setting-up-intellij-and-sbt-for-scala.html
+[Set up a spark application development environment in Fedora]: http://blog.gluster.org/2014/07/set-up-a-spark-application-devleopment-environment-in-fedora-2/
+
 Follow the instruction in [Quick Start],
 
 ```
@@ -441,7 +478,8 @@ info] Done updating.
 [success] Total time: 332 s, completed Dec 23, 2014 12:58:49 AM
 ```
 
-I don't know why, **it needs `bash` shell**, 
+I don't know why, local[2] does not work under zsh; **it needs `bash` shell**, 
+
 YOUR_SPARK_HOME = ~/Projects/spark/ampcamp5/ampcamp5-usb/spark
 
 ```
@@ -461,6 +499,7 @@ bash-3.2$
 ## Spark Streaming
 
 [difference streaming sources]: https://spark.apache.org/docs/1.2.0/img/streaming-arch.png
+[Discretized Streams: A Fault-Tolerant Model for Scalable Stream Processing]: http://www.eecs.berkeley.edu/Pubs/TechRpts/2012/EECS-2012-259.pdf
 
 Spark Streaming can take different streaming sources. [spark streaming doc]
 ![difference streaming sources]
@@ -471,12 +510,8 @@ Spark Streaming can take different streaming sources. [spark streaming doc]
 
 ### Use Twitter
 [Deep Dive with Spark Streaming - Tathagata Das - Spark Meetup 2013-06-17]: http://www.slideshare.net/spark-project/deep-divewithsparkstreaming-tathagatadassparkmeetup20130617
-
 [Video]: http://youtu.be/D1knCQZQQnw­
-
 [Spark Submmit 2014 Data Streaming]: https://databricks-training.s3.amazonaws.com/slides/Spark%20Summit%202014%20-%20Spark%20Streaming.pdf
-
 [twitter stream set up]: http://ampcamp.berkeley.edu/3/exercises/realtime-processing-with-spark-streaming.html
-
 [spark streaming doc]: https://spark.apache.org/docs/1.2.0/streaming-programming-guide.html
 
