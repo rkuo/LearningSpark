@@ -1,4 +1,4 @@
-# AMPLab Camp 5 Self Study
+# AMPLib Camp 5 Self Study 
 
 ## Online Resources
 - From AMP camp site [Slide, Video] and [Getting Started With Your USB Stick]
@@ -229,9 +229,10 @@ scala> pagecounts.count
 res3: Long = 1398882
 ```
 
-We can watch the operation from web gui, `http://127.0.0.1:4040` ![Spark web gui stage]
+We can use web gui, `http://127.0.0.1:4040`, ![Spark web gui stage] see [spark in a stick] for short introduction.
 
 [Spark web gui stage]: https://www.evernote.com/shard/s302/sh/6b012314-b7ed-480c-b626-8cb14a994e34/c87bc6b7fb168173a018f81508ebac69/deep/0/Spark-shell---Spark-Stages.png
+[spark in a stick]: http://blueplastic.gitbooks.io/how-to-light-your-spark-on-a-stick/content/spark_web_uis/spark_stages_ui.html
 
 [continue from here later](http://ampcamp.berkeley.edu/5/exercises/data-exploration-using-spark.html) I have some problem before, it is due to file does not exist and path is not correct, `val pagecounts = sc.textFile("../data/pagecounts")` works now.
 
@@ -454,6 +455,47 @@ scala> res2.foreach(println)
 (be,2)
 (to,2)
 ```
+Save as text file,
+
+```
+scala> wordCounts.saveAsTextFile("../wordcount")
+14/12/25 05:22:18 INFO SparkContext: Starting job: saveAsTextFile at <console>:17
+14/12/25 05:22:18 INFO MapOutputTrackerMaster: Size of output statuses for shuffle 0 is 151 bytes
+14/12/25 05:22:18 INFO DAGScheduler: Stage 2 (saveAsTextFile at <console>:17) finished in 0.061 s
+14/12/25 05:22:18 INFO SparkContext: Job finished: saveAsTextFile at <console>:17, took 0.080836 s
+
+scala> :q
+Stopping spark context.
+```
+Results are in 3 partitions;
+
+```
+~/Projects/spark/ampcamp5/ampcamp5-usb tree wordcount
+wordcount
+|-- _SUCCESS
+|-- part-00000
+|-- part-00001
+`-- part-00002
+
+0 directories, 4 files
+~/Projects/spark/ampcamp5/ampcamp5-usb cat wordcount/part-00001
+(not,1)
+(be,2)
+~/Projects/spark/ampcamp5/ampcamp5-usb cat wordcount/part-00000
+(or,1)
+~/Projects/spark/ampcamp5/ampcamp5-usb cat wordcount/part-00002
+(to,2)
+~/Projects/spark/ampcamp5/ampcamp5-usb
+```
+Check partition,
+
+```
+scala> lines.partitions.length
+14/12/25 05:14:40 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+14/12/25 05:14:40 WARN LoadSnappy: Snappy native library not loaded
+14/12/25 05:14:40 INFO FileInputFormat: Total input paths to process : 1
+res0: Int = 3
+```
 
 ### Standalone App  
 [Spark Programming Guide]: http://spark.apache.org/docs/latest/programming-guide.html
@@ -501,17 +543,164 @@ bash-3.2$
 [difference streaming sources]: https://spark.apache.org/docs/1.2.0/img/streaming-arch.png
 [Discretized Streams: A Fault-Tolerant Model for Scalable Stream Processing]: http://www.eecs.berkeley.edu/Pubs/TechRpts/2012/EECS-2012-259.pdf
 
-Spark Streaming can take different streaming sources. [spark streaming doc]
+Spark Streaming can take different streaming sources from [spark streaming doc]
 ![difference streaming sources]
+
+For different module, we need to create different sparkContext (sc). The general purpose sc is created automatically. StreamingContext is the main entry point for all streaming functionality. We create a local StreamingContext with two execution threads, and batch interval of 1 second. 
+
+```
+scala> import org.apache.spark._
+import org.apache.spark._
+
+scala> import org.apache.spark.streaming._
+import org.apache.spark.streaming._
+
+scala> import org.apache.spark.streaming.StreamingContext._
+import org.apache.spark.streaming.StreamingContext._
+
+scala> val conf = new SparkConf().setMaster("local[2]").setAppName("NetworkWordCount")
+conf: org.apache.spark.SparkConf = org.apache.spark.SparkConf@2a5b5669
+
+scala> val ssc = new StreamingContext(conf, Seconds(1))
+14/12/25 07:45:15 INFO SecurityManager: Changing view acls to: rkuo,
+14/12/25 07:45:15 INFO SecurityManager: Changing modify acls to: rkuo,
+14/12/25 07:45:15 INFO SecurityManager: SecurityManager: authentication disabled; ui acls disabled; users with view permissions: Set(rkuo, ); users with modify permissions: Set(rkuo, )
+14/12/25 07:45:15 INFO Slf4jLogger: Slf4jLogger started
+...[snip]...
+14/12/25 07:45:15 INFO AkkaUtils: Connecting to HeartbeatReceiver: akka.tcp://sparkDriver@localhost:58104/user/HeartbeatReceiver
+ssc: org.apache.spark.streaming.StreamingContext = org.apache.spark.streaming.StreamingContext@28589132
+```
 
 ### Use NC
 
-### Use Kafka 
+Like we did from textfile, set up source of streaming, from localhost port 9999.
+
+```
+scala> val lines = ssc.socketTextStream("localhost", 9999)
+lines: org.apache.spark.streaming.dstream.ReceiverInputDStream[String] = org.apache.spark.streaming.dstream.SocketInputDStream@14eaf5b4
+```
+
+Map,
+
+```
+scala> val words = lines.flatMap(_.split(" "))
+words: org.apache.spark.streaming.dstream.DStream[String] = org.apache.spark.streaming.dstream.FlatMappedDStream@34e9059c
+
+scala> val pairs = words.map(word => (word, 1))
+pairs: org.apache.spark.streaming.dstream.DStream[(String, Int)] = org.apache.spark.streaming.dstream.MappedDStream@42f5225
+```
+Reduce,
+
+```
+scala> val wordCounts = pairs.reduceByKey(_ + _)
+wordCounts: org.apache.spark.streaming.dstream.DStream[(String, Int)] = org.apache.spark.streaming.dstream.ShuffledDStream@14d44e83
+```
+Print or display,
+
+```
+wordCounts.print()
+```
+To start the actual count,
+
+```
+ssc.start()             // Start the computation
+ssc.awaitTermination()  // Wait for the computation to terminate
+```
+
+Because there is no streaming, you will see some error message. 
+Start another terminal 2 and enter
+
+```
+~/Projects nc -lk 9999
+hello world
+this is richard
+to be or not to be
+```
+We will see the word count in terminal 1, which is spark-shell running,
+
+```
+-------------------------------------------
+Time: 1419545581000 ms
+-------------------------------------------
+(hello,1)
+(world,1)
+...[snip]...
+-------------------------------------------
+Time: 1419545595000 ms
+-------------------------------------------
+(is,1)
+(this,1)
+(richard,1)
+
+-------------------------------------------
+Time: 1419545596000 ms
+-------------------------------------------
+
+-------------------------------------------
+Time: 1419554198000 ms
+-------------------------------------------
+(not,1)
+(or,1)
+(be,2)
+(to,2)
+
+```
+Use ctnl-c to terminate process. 
+
+[working example for NC]: http://spark.apache.org/docs/latest/streaming-programming-guide.html
 
 ### Use Twitter
 [Deep Dive with Spark Streaming - Tathagata Das - Spark Meetup 2013-06-17]: http://www.slideshare.net/spark-project/deep-divewithsparkstreaming-tathagatadassparkmeetup20130617
-[Video]: http://youtu.be/D1knCQZQQnw­
+[Video]: https://www.youtube.com/watch?v=D1knCQZQQnw
 [Spark Submmit 2014 Data Streaming]: https://databricks-training.s3.amazonaws.com/slides/Spark%20Summit%202014%20-%20Spark%20Streaming.pdf
 [twitter stream set up]: http://ampcamp.berkeley.edu/3/exercises/realtime-processing-with-spark-streaming.html
 [spark streaming doc]: https://spark.apache.org/docs/1.2.0/streaming-programming-guide.html
+[twitter application key registration]: https://dev.twitter.com/apps
 
+Follow this [twitter application key registration] and copy access keys to twitter.txt,
+
+```
+consumer key = xxx
+consumerSecret = yyy
+accessToken = zzz
+accessTokenSecret = wwww
+```
+Referring to sample code: Tutorial.scala, import library to spark-shell,
+
+```
+import org.apache.spark._
+import org.apache.spark.SparkContext._
+import org.apache.spark.streaming._
+import org.apache.spark.streaming.twitter._
+import org.apache.spark.streaming.StreamingContext._
+import TutorialHelper._
+```
+There are two errors, sample was not designed for REPL. I need to find out how to read in the external data and script, delay this for now. 
+
+```
+scala> import org.apache.spark.streaming.twitter._
+<console>:19: error: object twitter is not a member of package org.apache.spark.streaming
+       import org.apache.spark.streaming.twitter._
+                                         ^
+
+scala> import org.apache.spark.streaming.StreamingContext._
+import org.apache.spark.streaming.StreamingContext._
+
+scala> import TutorialHelper._
+<console>:22: error: not found: value TutorialHelper
+       import TutorialHelper._
+              ^
+```
+After the code entered, run command before to execute the program, but there is error message,
+
+```
+~/Projects/spark/ampcamp5/ampcamp5-usb/simple-twitter-streaming/scala sbt/sbt package run
+Getting org.scala-sbt sbt 0.13.1 ...
+downloading http://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/sbt/0.13.1/jars/sbt.jar ...
+	[SUCCESSFUL ] org.scala-sbt#sbt;0.13.1!sbt.jar (1066ms)
+...[snip]...	
+	at java.lang.Thread.run(Thread.java:722)
+[error] (*:update) sbt.ResolveException: unresolved dependency: org.scala-lang#scala-library;2.10: not found
+[error] unresolved dependency: org.scala-lang#scala-compiler;2.10: not found
+[error] Total time: 414 s, completed Dec 27, 2014 10:44:51 PM
+```
