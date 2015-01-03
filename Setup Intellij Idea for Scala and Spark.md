@@ -5,12 +5,12 @@
 - Scala 
 
 [install Idea for coursera class]: https://www.youtube.com/watch?v=xtMfNcBL8g8
-[very good step by step for setting up Spark]: http://apache-spark-user-list.1001560.n3.nabble.com/Is-there-a-step-by-step-instruction-on-how-to-build-Spark-App-with-IntelliJ-IDEA-td18473.html
+[step by step for setting up Spark]: http://apache-spark-user-list.1001560.n3.nabble.com/Is-there-a-step-by-step-instruction-on-how-to-build-Spark-App-with-IntelliJ-IDEA-td18473.html
 
 I used this two links for my setup:
 
 - [install Idea for coursera class]
-- [very good step by step for setting up Spark]
+- [step by step for setting up Spark]
 
 ## Setup Scala
 
@@ -57,7 +57,7 @@ class Hello {
 }
 ```
 
-code for worksheet,
+code to try out on worksheet,
 
 ```
 import demo.Hello
@@ -72,4 +72,29 @@ This is very good workflow example;
 - implement method to pass test,
 - use worksheet for real value test.
 
-I did not do project importing portion of tutorial. 
+The reference link also described importing project, which was exercised here. 
+
+It is good to start with build.sbt to include all dependencies, and when we refresh the system, which will check competibility among libraies.
+
+## Set up Spark
+
+The following steps are from [step by step for setting up Spark]:
+
+- create build.sbt, then refresh it.
+
+```
+name := "TestSpark"
+
+version := "1.0"
+
+scalaVersion := "2.11.4"
+
+libraryDependencies ++=Seq("org.apache.spark" %% "spark-core" % "1.2.0",
+  "org.apache.hadoop" % "hadoop-client" % "2.4.0"
+)
+```
+
+
+
+
+
