@@ -572,6 +572,7 @@ ssc: org.apache.spark.streaming.StreamingContext = org.apache.spark.streaming.St
 ```
 
 ### Use NC
+**import library first, see above**
 
 Like we did from textfile, set up source of streaming, from localhost port 9999.
 
