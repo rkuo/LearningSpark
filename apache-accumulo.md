@@ -47,6 +47,10 @@ From [Accumulo Summit 2014: Benchmarking]
 
 * Mesos can deploy Yarn, Cloudera, and Accumulo, which can make Accumulo as part of enterprise data eco-systems.
 
+### Development
+
+![Accumulo development activity]
+
 ## Sqrrl Enterprise 
 Since sqrrl enhanced Apached Accumulo and it is part of more complete solution, its architecture is depicted below.
 
@@ -80,3 +84,4 @@ It supports full life cycle data analytics.
 [Accumulo data model]:http://accumulo.apache.org/user_manual_1.3-incubating/img1.png
 [sqrrl linked property]:http://sqrrl.com/media/OutSolution-copy-1024x569.png
 [sqrrl flow]:http://sqrrl.com/media/SQR_Diagrams_2-01.png
+[Accumulo development activity]:http://note.io/1Fv7SPY
