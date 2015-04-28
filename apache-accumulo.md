@@ -6,7 +6,7 @@ Sqrrl was founded by former computer scientists from the U.S. National Security 
 
 They are serious. 
 
-**sqrrl Enterprise** (commercial) is built on top **Apache Accumulo** (free and open source); we will use two separate terms to refer these two packages in this report.
+**Sqrrl Enterprise** (commercial) is built on top **Apache Accumulo** (free and open source); we will use two separate terms to refer these two packages in this report.
 
 ## Accumulo
 [Apache Accumulo] is sorted, distributed key/value store with cell-based access control and customizable server-side processing. It is based on [Google's BigTable design] and is built on top of Apache Hadoop, Zookeeper, and Thrift. 
@@ -64,7 +64,7 @@ It supports full life cycle data analytics.
 
 ![sqrrl flow]
 
-## Links
+
 [sqrrl icon]:http://insidebigdata.com/wp-content/uploads/2013/10/sqrrl_logo.jpg
 [sqrrl architecture]:http://sqrrl.com/media/SQR_Diagrams-03.jpg
 [1]:http://en.wikipedia.org/wiki/Sqrrl
